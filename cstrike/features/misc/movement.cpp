@@ -52,27 +52,31 @@ void F::MISC::MOVEMENT::BunnyHop(CUserCmd* pCmd, CBaseUserCmdPB* pUserCmd, C_CSP
 		return;
 
 	// update random seed
-	//MATH::fnRandomSeed(pUserCmd->nRandomSeed);
+	MATH::fnRandomSeed(pUserCmd->nRandomSeed);
+	static bool bShouldFakeJump = false;
+	// bypass of possible SMAC/VAC server anticheat detection
+	if (bShouldFakeJump)
+	{
+		pCmd->nButtons.nValue |= IN_JUMP;
+		bShouldFakeJump = false;
+	}
+	// check is player want to jump
+	else if (pCmd->nButtons.nValue & IN_JUMP)
+	{
+		// check is player on the ground
+		if (pLocalPawn->GetFlags() & FL_ONGROUND)
+		{
+			bShouldFakeJump = true;
 
-	//// bypass of possible SMAC/VAC server anticheat detection
-	//if (static bool bShouldFakeJump = false; bShouldFakeJump)
-	//{
-	//	pCmd->nButtons.nValue |= IN_JUMP;
-	//	bShouldFakeJump = false;
-	//}
-	//// check is player want to jump
-	//else if (pCmd->nButtons.nValue & IN_JUMP)
-	//{
-	//	// check is player on the ground
-	//	if (pLocalPawn->GetFlags() & FL_ONGROUND)
-	//		// note to fake jump at the next tick
-	//		bShouldFakeJump = true;
-	//	// check did random jump chance passed
-	//	else if (MATH::fnRandomInt(0, 100) <= C_GET(int, Vars.nAutoBHopChance))
-	//		pCmd->nButtons.nValue &= ~IN_JUMP;
-	//}
+		} else if (MATH::fnRandomInt(0, 100) <= C_GET(int, Vars.nAutoBHopChance)){
+			pCmd->nButtons.nValue &= ~IN_JUMP;
+		}
+	}
 
-	// im lazy so yea :D
+
+
+	// create a sleep 10u
+
 	if (pLocalPawn->GetFlags() & FL_ONGROUND)
 	{
 		pUserCmd->pInButtonState->SetBits(EButtonStatePBBits::BUTTON_STATE_PB_BITS_BUTTONSTATE1);
@@ -166,7 +170,6 @@ void F::MISC::MOVEMENT::MovementCorrection(CBaseUserCmdPB* pUserCmd, CCSGOInputH
 	Vector_t vecOldForward = {}, vecOldRight = {}, vecOldUp = {};
 	pInputEntry->pViewAngles->angValue.ToDirections(&vecOldForward, &vecOldRight, &vecOldUp);
 
-	// we don't attempt on forward/right roll, and on up pitch/yaw
 	vecOldForward.z = vecOldRight.z = vecOldUp.x = vecOldUp.y = 0.0f;
 
 	vecOldForward.NormalizeInPlace();
@@ -174,10 +177,10 @@ void F::MISC::MOVEMENT::MovementCorrection(CBaseUserCmdPB* pUserCmd, CCSGOInputH
 	vecOldUp.NormalizeInPlace();
 
 	const float flPitchForward = vecForward.x * pUserCmd->flForwardMove;
-	const float flYawForward = vecForward.y * pUserCmd->flForwardMove;
-	const float flPitchSide = vecRight.x * pUserCmd->flSideMove;
-	const float flYawSide = vecRight.y * pUserCmd->flSideMove;
-	const float flRollUp = vecUp.z * pUserCmd->flUpMove;
+	const float flYawForward   = vecForward.y * pUserCmd->flForwardMove;
+	const float flPitchSide    = vecRight.x * pUserCmd->flSideMove;
+	const float flYawSide      = vecRight.y * pUserCmd->flSideMove;
+	const float flRollUp       = vecUp.z * pUserCmd->flUpMove;
 
 	// solve corrected movement speed
 	pUserCmd->SetBits(EBaseCmdBits::BASE_BITS_FORWARDMOVE);
