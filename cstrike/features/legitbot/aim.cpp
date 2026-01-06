@@ -23,7 +23,7 @@ void F::LEGITBOT::AIM::OnMove(CUserCmd* pCmd, CBaseUserCmdPB* pBaseCmd, CCSPlaye
 
 	if (!pLocalController->IsPawnAlive())
 		return;
-
+	
 	AimAssist(pBaseCmd, pLocalPawn, pLocalController);
 }
 
@@ -190,3 +190,6 @@ void F::LEGITBOT::AIM::AimAssist(CBaseUserCmdPB* pUserCmd, C_CSPlayerPawn* pLoca
 	pViewAngles->y += (vNewAngles.y - aimPunch.y) / flSmoothing;
 	pViewAngles->Normalize();
 }
+
+
+

@@ -14,6 +14,7 @@ using namespace F;
 
 bool F::VISUALS::Setup()
 {
+
 	if (!CHAMS::Initialize())
 	{
 		L_PRINT(LOG_ERROR) << CS_XOR("failed to initialize chams");

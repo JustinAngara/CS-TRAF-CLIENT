@@ -64,7 +64,30 @@ bool InjectDLL(DWORD processId, const char* dllPath)
 		return false;
 	}
 
+	std::cout << "Waiting for LoadLibraryA to complete..." << std::endl;
 	WaitForSingleObject(hThread, INFINITE);
+
+	// **THIS IS THE KEY CHECK**
+	DWORD exitCode;
+	GetExitCodeThread(hThread, &exitCode);
+
+	std::cout << "LoadLibraryA returned: 0x" << std::hex << exitCode << std::dec << std::endl;
+
+	if (exitCode == 0)
+	{
+		std::cout << "[CRITICAL] LoadLibraryA returned NULL!" << std::endl;
+		std::cout << "DLL did NOT actually load. Possible reasons:" << std::endl;
+		std::cout << "  1. Missing dependencies (MSVCP140D.dll, etc.)" << std::endl;
+		std::cout << "  2. DLL_PROCESS_ATTACH returned FALSE" << std::endl;
+		std::cout << "  3. Entry point not found" << std::endl;
+		std::cout << "  4. DLL crashed during initialization" << std::endl;
+		CloseHandle(hThread);
+		VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
+		CloseHandle(hProcess);
+		return false;
+	}
+
+	std::cout << "[SUCCESS] DLL module loaded at: 0x" << std::hex << exitCode << std::dec << std::endl;
 
 	CloseHandle(hThread);
 	VirtualFreeEx(hProcess, allocMem, 0, MEM_RELEASE);
@@ -73,9 +96,10 @@ bool InjectDLL(DWORD processId, const char* dllPath)
 	return true;
 }
 
+
 int main()
 {
-	const char* dllPath = "C:\\Users\\justi\\source\\repos\\asphyxia\\asphyxia-cs2\\build\\Debug\\cstrike.dll";
+	const char* dllPath = "C:\\Users\\justi\\source\\repos\\asphyxia\\asphyxia-cs2\\x64\\Release\\mintest.dll";
 	
 
 

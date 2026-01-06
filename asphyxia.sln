@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.3.11312.210 d18.3
+VisualStudioVersion = 18.3.11312.210
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cstrike", "cstrike\cstrike.vcxproj", "{DAC639DD-46A6-B878-4FBE-434FBB1C1FDA}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Injector", "Injector\Injector.vcxproj", "{8D345F08-270A-43C2-938B-48BCC67E32A8}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mintest", "mintest\mintest.vcxproj", "{61B7896A-ECAF-41EC-8E4C-673A14958F74}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,8 +23,15 @@ Global
 		{8D345F08-270A-43C2-938B-48BCC67E32A8}.Debug|x64.Build.0 = Debug|x64
 		{8D345F08-270A-43C2-938B-48BCC67E32A8}.Release|x64.ActiveCfg = Release|x64
 		{8D345F08-270A-43C2-938B-48BCC67E32A8}.Release|x64.Build.0 = Release|x64
+		{61B7896A-ECAF-41EC-8E4C-673A14958F74}.Debug|x64.ActiveCfg = Debug|x64
+		{61B7896A-ECAF-41EC-8E4C-673A14958F74}.Debug|x64.Build.0 = Debug|x64
+		{61B7896A-ECAF-41EC-8E4C-673A14958F74}.Release|x64.ActiveCfg = Release|x64
+		{61B7896A-ECAF-41EC-8E4C-673A14958F74}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8DFDCD17-3B53-4A0F-A1B8-FA4342A3FC42}
 	EndGlobalSection
 EndGlobal

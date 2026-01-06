@@ -218,22 +218,59 @@ DWORD WINAPI PanicThread(LPVOID lpParameter)
 
 extern "C" BOOL WINAPI _CRT_INIT(HMODULE hModule, DWORD dwReason, LPVOID lpReserved);
 
-BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
-{
-	if (fdwReason == DLL_PROCESS_ATTACH)
-	{
-		FILE* test = fopen("C:\\dllmain_test.txt", "w");
-		if (test)
-		{
-			fprintf(test, "Standard DllMain called!");
-			fclose(test);
-		}
-	}
-	return TRUE;
-}
+
 
 BOOL APIENTRY CoreEntryPoint(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 {
+	{ // this is just going to be for test
+		
+		if (dwReason == DLL_PROCESS_ATTACH)
+		{
+			MessageBoxA(NULL, "CoreEntryPoint reached!", "Test", MB_OK);
+			FILE* log = fopen("C:\\CORE_ENTRY_LOG.txt", "w");
+			if (log)
+			{
+				fprintf(log, "CoreEntryPoint called!\n");
+				fprintf(log, "About to call DisableThreadLibraryCalls...\n");
+				fclose(log);
+			}
+		}
+
+		DisableThreadLibraryCalls(hModule);
+
+		if (dwReason == DLL_PROCESS_DETACH)
+		{
+			Destroy();
+			return TRUE; // Don't process further on detach
+		}
+
+		// Log before _CRT_INIT
+		if (dwReason == DLL_PROCESS_ATTACH)
+		{
+			FILE* log = fopen("C:\\CORE_ENTRY_LOG.txt", "a");
+			if (log)
+			{
+				fprintf(log, "About to call _CRT_INIT...\n");
+				fclose(log);
+			}
+		}
+
+		if (!_CRT_INIT(hModule, dwReason, lpReserved))
+		{
+			if (dwReason == DLL_PROCESS_ATTACH)
+			{
+				FILE* log = fopen("C:\\CORE_ENTRY_LOG.txt", "a");
+				if (log)
+				{
+					fprintf(log, "_CRT_INIT FAILED!\n");
+					fclose(log);
+				}
+			}
+			return FALSE;
+		}
+
+	}
+
 	// Disables the DLL_THREAD_ATTACH and DLL_THREAD_DETACH notifications for the specified dynamic-link library (DLL). This can reduce the size of the working set for some applications
 	DisableThreadLibraryCalls(hModule);
 
@@ -290,3 +327,6 @@ BOOL APIENTRY CoreEntryPoint(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 
 	return TRUE;
 }
+
+
+// This old test code from earlier
