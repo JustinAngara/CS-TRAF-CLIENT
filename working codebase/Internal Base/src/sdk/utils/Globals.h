@@ -2,6 +2,8 @@
 #include <cstdint>
 #include <Windows.h>
 
+
+// default values
 namespace Globals
 {
     inline float ViewMatrix[16] = { 0.f };
@@ -23,5 +25,6 @@ namespace Globals
     inline float esp_name_color[4] = { 1.f, 1.f, 1.f, 1.f };
 
     inline bool esp_health = true;
+
 
 }

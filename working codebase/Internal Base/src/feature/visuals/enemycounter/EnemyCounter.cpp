@@ -34,7 +34,7 @@ void EnemyCounter::Render()
     ImDrawList* dl = ImGui::GetBackgroundDrawList();
     dl->AddText(
         { 20.f, 20.f }, // posizione
-        IM_COL32(255, 255, 255, 220),
+        IM_COL32(255, 255, 255, 255),
         buf
     );
 }

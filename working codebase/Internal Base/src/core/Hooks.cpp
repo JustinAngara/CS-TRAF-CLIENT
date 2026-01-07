@@ -15,11 +15,11 @@
 
 #pragma comment(lib, "d3d11.lib")
 
-static ID3D11Device* g_Device = nullptr;
-static ID3D11DeviceContext* g_Context = nullptr;
-static ID3D11RenderTargetView* g_RTV = nullptr;
+static ID3D11Device* g_Device            = nullptr;
+static ID3D11DeviceContext* g_Context    = nullptr;
+static ID3D11RenderTargetView* g_RTV     = nullptr;
 static HWND                     g_Window = nullptr;
-static bool                     g_Init = false;
+static bool                     g_Init   = false;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(
     HWND, UINT, WPARAM, LPARAM
@@ -88,7 +88,7 @@ HRESULT __stdcall Hooks::hkPresent(IDXGISwapChain* swapChain, UINT sync, UINT fl
         Menu::Render();
 
     Visuals::Render();
-	Misc::Render();
+	Misc::Run();
 
     ImGui::Render();
     g_Context->OMSetRenderTargets(1, &g_RTV, nullptr);

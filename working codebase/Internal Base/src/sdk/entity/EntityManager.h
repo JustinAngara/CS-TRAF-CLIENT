@@ -25,7 +25,7 @@ public:
     static EntityManager& Get();
 
     void Update();
-
+	
     C_CSPlayerPawn* GetLocalPawn();
     const std::vector<Entity_t>& GetEntities();
     C_CSPlayerPawn* GetPawnFromHandle(uint32_t handle);

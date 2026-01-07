@@ -10,6 +10,7 @@ uintptr_t Memory::GetModuleBase(const char* module)
 
 static std::vector<int> PatternToBytes(const char* pattern)
 {
+	// locating certain patterns via wildcards
     std::vector<int> bytes;
 
     for (const char* c = pattern; *c; ++c)
