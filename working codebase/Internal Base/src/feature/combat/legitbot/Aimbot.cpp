@@ -2,22 +2,25 @@
 #include "../../../sdk/entity/EntityManager.h"
 #include "../../../sdk/utils/Utils.h"
 #include "../../../sdk/memory/PatternScan.h"
-
+#include "../../../sdk/utils/Globals.h"
 
 #include <Windows.h>
 
 namespace Aimbot {
 
     constexpr uintptr_t dwViewAngles = 0x1E3C800; 
+	namespace AIM = Globals;
 
     void Run() 
     {
-        if (!aimbot_enabled) return;
+		if (!AIM::aimbot_enabled)
+			return;
 
         C_CSPlayerPawn* local = EntityManager::Get().GetLocalPawn();
         if (!local || !local->IsAlive()) return;
 
-        if (!(GetAsyncKeyState(aimbot_key) & 0x8000)) return;
+        if (!(GetAsyncKeyState(AIM::aimbot_key) & 0x8000))
+			return;
 
         C_CSPlayerPawn* bestTarget = GetBestTarget(local);
         if (!bestTarget) return;
@@ -42,12 +45,12 @@ namespace Aimbot {
         Vector* currentAngles = reinterpret_cast<Vector*>(client + dwViewAngles);
         if (!currentAngles) return;
 
-        if (aimbot_smooth)
+        if (AIM::aimbot_smooth)
         {
             Vector delta = aimAngles - *currentAngles;
             Utils::NormalizeAngles(delta);
 
-            *currentAngles += delta * aimbot_smoothness;
+            *currentAngles += delta * AIM::aimbot_smoothness;
         }
         else 
         {
@@ -61,7 +64,7 @@ namespace Aimbot {
     {
         const auto& entities = EntityManager::Get().GetEntities();
         C_CSPlayerPawn* bestTarget = nullptr;
-        float bestDistance = aimbot_fov;
+		float bestDistance = Globals::aimbot_fov;
 
         uintptr_t client = Memory::GetModuleBase("client.dll");
         if (!client) return nullptr;

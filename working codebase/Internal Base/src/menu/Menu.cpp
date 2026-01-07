@@ -165,5 +165,11 @@ void Menu::Render()
     CustomCheckbox("Name", &Globals::esp_name);
     CustomCheckbox("Health bar", &Globals::esp_health);
 
+	ImGui::Spacing();
+
+	// aimbot stuf
+	CustomCheckbox("Aimbot", &Globals::esp_name);
+
+
     ImGui::End();
 }
