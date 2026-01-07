@@ -1,7 +1,4 @@
 #pragma once
-
-namespace Bhop {
-    void Run();
-    void performJump();
-    void releaseJump();
+namespace Bhop{
+	void Run();
 }

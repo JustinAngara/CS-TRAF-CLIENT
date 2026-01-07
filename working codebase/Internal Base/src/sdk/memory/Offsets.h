@@ -1,8 +1,6 @@
 #pragma once
 #include <cstdint>
 
-
-//achieve dumper via https://github.com/a2x/cs2-dumper
 namespace Offsets
 {
     // -> offsets.h on a2x dumper
@@ -23,14 +21,14 @@ namespace Offsets
 	// -> C_CSPlayerPawn
     constexpr uintptr_t m_iShotsFired = 0x272C;
     constexpr uintptr_t m_aimPunchAngle = 0x16E4;
-    constexpr uintptr_t m_fFlags = 0x4C4;  // Player movement flags
-
-
+    constexpr uintptr_t m_fFlags = 0x4C4;  
 
 	// -> C_CSPlayerController
     constexpr uintptr_t m_iszPlayerName = 0x6E8;
     constexpr uintptr_t m_hPlayerPawn = 0x8FC;
     constexpr uintptr_t m_bPawnIsAlive = 0x7EC;
+
+
 
 	// -> CBodyComponentSkeletonInstance
     constexpr uintptr_t m_modelState = 0x190;

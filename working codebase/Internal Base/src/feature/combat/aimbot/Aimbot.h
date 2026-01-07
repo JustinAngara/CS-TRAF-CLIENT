@@ -1,6 +1,4 @@
 #pragma once
-#include "../../../sdk/entity/EntityManager.h"
-#include "../../../sdk/utils/Utils.h"
 
 namespace Aimbot
 {

@@ -38,9 +38,9 @@ public:
     SCHEMA(Vector, m_aimPunchAngle, Offsets::m_aimPunchAngle);
     SCHEMA(uintptr_t, m_pObserverServices, Offsets::m_pObserverServices);
 
-	// this is for the fFlag
+    // this is for the fFlag
     SCHEMA(int, m_fFlags, Offsets::m_fFlags);
-    bool IsOnGround() const { return (m_fFlags() & 1) != 0; } 
+    bool IsOnGround() const { return (m_fFlags() & 1) != 0; }
 };
 
 class C_CSPlayerController : public C_BaseEntity

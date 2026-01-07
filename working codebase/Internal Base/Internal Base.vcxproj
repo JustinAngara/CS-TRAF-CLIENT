@@ -33,6 +33,7 @@
     <ClCompile Include="ext\minhook\trampoline.c" />
     <ClCompile Include="src\core\Hooks.cpp" />
     <ClCompile Include="src\core\Main.cpp" />
+    <ClCompile Include="src\feature\combat\Combat.cpp" />
     <ClCompile Include="src\feature\combat\legitbot\Aimbot.cpp" />
     <ClCompile Include="src\feature\misc\bhop\Bhop.cpp" />
     <ClCompile Include="src\feature\misc\bhop\Bhop.h" />

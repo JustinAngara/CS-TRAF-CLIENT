@@ -1,7 +1,6 @@
 #include <Windows.h>
 #include <thread>
 #include <chrono>
-#include <iostream>
 #include "Hooks.h"
 
 static HANDLE g_MainThread = nullptr;
@@ -12,7 +11,6 @@ DWORD WINAPI MainThread(LPVOID module)
     AllocConsole();
     FILE* f;
     freopen_s(&f, "CONOUT$", "w", stdout);
-	std::cout << "now in side the dll main \n";
 #endif
 
     Hooks::Setup();
@@ -31,9 +29,6 @@ DWORD WINAPI MainThread(LPVOID module)
     return 0;
 }
 
-
-
-// creates dll
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID)
 {
     if (reason == DLL_PROCESS_ATTACH)

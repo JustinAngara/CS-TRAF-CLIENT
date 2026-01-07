@@ -14,9 +14,7 @@ void ESP::Render()
     const float sw = ImGui::GetIO().DisplaySize.x;
     const float sh = ImGui::GetIO().DisplaySize.y;
 
-	// load the entities from the game
     const auto& entities = EntityManager::Get().GetEntities();
-	// local pawn means character yourself
     C_CSPlayerPawn* localPawn = EntityManager::Get().GetLocalPawn();
     if (!localPawn)
         return;
@@ -63,10 +61,8 @@ void ESP::Render()
         float x = sHead.x - w * 0.5f;
         float y = sHead.y;
 
-		// globals is static, just certai nsettings
         if (Globals::esp_box)
         {
-			
             dl->AddRect({ x, y }, { x + w, y + h }, boxCol, 0.f, 0, Globals::esp_box_thickness);
             dl->AddRect({ x - 1, y - 1 }, { x + w + 1, y + h + 1 }, IM_COL32(0, 0, 0, 220));
         }

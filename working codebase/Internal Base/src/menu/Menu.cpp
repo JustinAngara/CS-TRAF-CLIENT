@@ -48,19 +48,6 @@ static void CustomCheckbox(const char* label, bool* v)
     ImGui::PopID();
 }
 
-static void CustomTitle(const char* label)
-{
-	ImGui::PushID(label);
-
-	ImVec2 p = ImGui::GetCursorScreenPos();
-	ImDrawList* dl = ImGui::GetWindowDrawList();
-	float sz = 18.f;
-
-	ImGui::SameLine();
-	ImGui::TextUnformatted(label);
-	ImGui::PopID();
-}
-
 static void CustomColor(const char* label, float col[4])
 {
     ImGui::PushID(label);
@@ -177,11 +164,6 @@ void Menu::Render()
 
     CustomCheckbox("Name", &Globals::esp_name);
     CustomCheckbox("Health bar", &Globals::esp_health);
-
-
-	ImGui::Spacing();
-	ImGui::Spacing();
-	CustomTitle("This is going to be somewhere in gui");
 
     ImGui::End();
 }
