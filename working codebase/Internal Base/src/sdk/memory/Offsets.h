@@ -28,7 +28,12 @@ namespace Offsets
     constexpr uintptr_t m_hPlayerPawn = 0x8FC;
     constexpr uintptr_t m_bPawnIsAlive = 0x7EC;
 
-
+	// dw stuff
+    constexpr uintptr_t dwViewAngles = 0x1E3C800; 
+    constexpr uintptr_t dwViewMatrix = 0x1E323D0; 
+    constexpr uintptr_t dwLocalPlayerPawn = 0x1BEEF28; 
+    constexpr uintptr_t dwGlobalVars = 0x1BE41C0; 
+    constexpr uintptr_t dwEntityList = 0x1D13CE8; 
 
 	// -> CBodyComponentSkeletonInstance
     constexpr uintptr_t m_modelState = 0x190;

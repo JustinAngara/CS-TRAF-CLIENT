@@ -2,13 +2,13 @@
 #include "../../../sdk/entity/EntityManager.h"
 #include "../../../sdk/utils/Utils.h"
 #include "../../../sdk/memory/PatternScan.h"
+#include "../../../sdk/memory/Offsets.h"
 #include "../../../sdk/utils/Globals.h"
 
 #include <Windows.h>
 
 namespace Aimbot {
 
-    constexpr uintptr_t dwViewAngles = 0x1E3C800; 
 	namespace AIM = Globals;
 
     void Run() 
@@ -42,7 +42,7 @@ namespace Aimbot {
         uintptr_t client = Memory::GetModuleBase("client.dll");
         if (!client) return;
 
-        Vector* currentAngles = reinterpret_cast<Vector*>(client + dwViewAngles);
+        Vector* currentAngles = reinterpret_cast<Vector*>(client + Offsets::dwViewAngles);
         if (!currentAngles) return;
 
         if (AIM::aimbot_smooth)
@@ -69,7 +69,7 @@ namespace Aimbot {
         uintptr_t client = Memory::GetModuleBase("client.dll");
         if (!client) return nullptr;
 
-        Vector* currentAngles = reinterpret_cast<Vector*>(client + dwViewAngles);
+        Vector* currentAngles = reinterpret_cast<Vector*>(client + Offsets::dwViewAngles);
         if (!currentAngles) return nullptr;
 
         for (const auto& ent : entities) 
