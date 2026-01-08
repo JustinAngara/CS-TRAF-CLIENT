@@ -8,7 +8,7 @@ static bool wait_for_bind = false;
 static ImVec2 bind_popup_pos = {};
 static constexpr int SIZE_X = 320, SIZE_Y = 260;
 
-static bool PollKey(int& out)
+static bool Menu::PollKey(int& out)
 {
     for (int i = 1; i < 256; i++)
     {
@@ -21,7 +21,7 @@ static bool PollKey(int& out)
     return false;
 }
 
-static void CustomCheckbox(const char* label, bool* v)
+static void Menu::CustomCheckbox(const char* label, bool* v)
 {
     ImGui::PushID(label);
 
@@ -50,7 +50,7 @@ static void CustomCheckbox(const char* label, bool* v)
     ImGui::PopID();
 }
 
-static void CustomColor(const char* label, float col[4])
+static void Menu::CustomColor(const char* label, float col[4])
 {
     ImGui::PushID(label);
 
@@ -83,7 +83,7 @@ static void CustomColor(const char* label, float col[4])
     ImGui::PopID();
 }
 
-static void CustomSlider(const char* label, float* v, float minVal, float maxVal)
+static void Menu::CustomSlider(const char* label, float* v, float minVal, float maxVal)
 {
 	ImGui::PushID(label);
 	ImVec2 p = ImGui::GetCursorScreenPos();
@@ -222,3 +222,6 @@ void Menu::Render()
 
     ImGui::End();
 }
+
+
+
