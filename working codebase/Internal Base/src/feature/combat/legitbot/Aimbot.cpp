@@ -10,8 +10,8 @@
 
 void Aimbot::run() 
 {
-	if (!Globals::aimbot_enabled)
-		return;
+
+	if (!Globals::aimbot_enabled) return;
 
     C_CSPlayerPawn* local = EntityManager::Get().GetLocalPawn();
     if (!local || !local->IsAlive()) return;
@@ -50,7 +50,7 @@ void Aimbot::aimAtTarget(C_CSPlayerPawn* local, C_CSPlayerPawn* target)
         Utils::NormalizeAngles(delta);
 
 		// this is going to be how we traverse through certian FOVs
-        *currentAngles += delta * Globals::aimbot_smoothness;
+        *currentAngles += delta * (1.f-Globals::aimbot_smoothness);
     }
     else 
     {

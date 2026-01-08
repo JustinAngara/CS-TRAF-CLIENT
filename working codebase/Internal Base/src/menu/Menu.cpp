@@ -2,81 +2,98 @@
 #include "../../ext/imgui/imgui.h"
 #include "../sdk/utils/Globals.h"
 #include <Windows.h>
-#include <algorithm> 
-
+#include <algorithm>
 
 static bool Menu::PollKey(int& out)
 {
-    for (int i = 1; i < 256; i++)
-    {
-        if (GetAsyncKeyState(i) & 1)
-        {
-            out = i;
-            return true;
-        }
-    }
-    return false;
+	for (int i = 1; i < 256; i++)
+	{
+		if (GetAsyncKeyState(i) & 1)
+		{
+			out = i;
+			return true;
+		}
+	}
+	return false;
 }
 
 static void Menu::CustomCheckbox(const char* label, bool* v)
 {
-    ImGui::PushID(label);
+	ImGui::PushID(label);
 
-    ImVec2 p = ImGui::GetCursorScreenPos();
-    ImDrawList* dl = ImGui::GetWindowDrawList();
-    float sz = 18.f;
+	ImVec2 p = ImGui::GetCursorScreenPos();
+	ImDrawList* dl = ImGui::GetWindowDrawList();
+	float sz = 18.f;
 
-    ImGui::InvisibleButton("checkbox", { sz, sz });
-    if (ImGui::IsItemClicked()) *v = !*v;
+	ImGui::InvisibleButton("checkbox", { sz, sz });
+	bool hovered = ImGui::IsItemHovered();
+	if (ImGui::IsItemClicked())
+		*v = !*v;
 
-    ImU32 col = *v ? IM_COL32(130, 90, 255, 255) : IM_COL32(45, 45, 45, 255);
-    dl->AddRectFilled(p, { p.x + sz, p.y + sz }, col, 4.f);
+	ImU32 bg_col = *v ? IM_COL32(130, 90, 255, 255) : (hovered ? IM_COL32(55, 55, 55, 255) : IM_COL32(40, 40, 40, 255));
 
-    if (*v)
-        dl->AddRectFilled(
-            { p.x + 5, p.y + 5 },
-            { p.x + sz - 5, p.y + sz - 5 },
-            IM_COL32(15, 15, 15, 255),
-            2.f
-        );
+	// Shadow
+	dl->AddRectFilled({ p.x + 1, p.y + 1 }, { p.x + sz + 1, p.y + sz + 1 }, IM_COL32(0, 0, 0, 80), 4.f);
+	// Main box
+	dl->AddRectFilled(p, { p.x + sz, p.y + sz }, bg_col, 4.f);
+	// Border
+	dl->AddRect(p, { p.x + sz, p.y + sz }, IM_COL32(0, 0, 0, 150), 4.f, 0, 1.5f);
 
-    ImGui::SameLine();
-    ImGui::TextUnformatted(label);
+	if (*v)
+	{
+		// Inner checkmark box
+		dl->AddRectFilled(
+		{ p.x + 5, p.y + 5 },
+		{ p.x + sz - 5, p.y + sz - 5 },
+		IM_COL32(255, 255, 255, 255),
+		2.f);
+	}
 
-    ImGui::PopID();
+	ImGui::SameLine();
+	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+	ImGui::TextUnformatted(label);
+
+	ImGui::PopID();
 }
 
 static void Menu::CustomColor(const char* label, float col[4])
 {
-    ImGui::PushID(label);
+	ImGui::PushID(label);
 
-    ImVec2 p = ImGui::GetCursorScreenPos();
-    ImDrawList* dl = ImGui::GetWindowDrawList();
+	ImVec2 p = ImGui::GetCursorScreenPos();
+	ImDrawList* dl = ImGui::GetWindowDrawList();
 
-    ImU32 c = ImGui::ColorConvertFloat4ToU32(
-        ImVec4(col[0], col[1], col[2], col[3])
-    );
+	ImU32 c = ImGui::ColorConvertFloat4ToU32(
+	ImVec4(col[0], col[1], col[2], col[3]));
 
-    ImGui::InvisibleButton("color", { 22, 14 });
-    if (ImGui::IsItemClicked())
-        ImGui::OpenPopup("picker");
+	ImGui::InvisibleButton("color", { 24, 16 });
+	bool hovered = ImGui::IsItemHovered();
 
-    dl->AddRectFilled(p, { p.x + 22, p.y + 14 }, c, 3.f);
-    dl->AddRect(p, { p.x + 22, p.y + 14 }, IM_COL32(0, 0, 0, 255), 3.f);
+	if (ImGui::IsItemClicked())
+		ImGui::OpenPopup("picker");
 
-    if (ImGui::BeginPopup("picker"))
-    {
-        ImGui::ColorPicker4("picker", col,
-            ImGuiColorEditFlags_NoInputs |
-            ImGuiColorEditFlags_NoSidePreview |
-            ImGuiColorEditFlags_NoSmallPreview);
-        ImGui::EndPopup();
-    }
+	// Shadow
+	dl->AddRectFilled({ p.x + 1, p.y + 1 }, { p.x + 25, p.y + 17 }, IM_COL32(0, 0, 0, 80), 3.f);
+	// Color box
+	dl->AddRectFilled(p, { p.x + 24, p.y + 16 }, c, 3.f);
+	// Border
+	ImU32 border_col = hovered ? IM_COL32(130, 90, 255, 255) : IM_COL32(0, 0, 0, 200);
+	dl->AddRect(p, { p.x + 24, p.y + 16 }, border_col, 3.f, 0, 1.5f);
 
-    ImGui::SameLine();
-    ImGui::TextUnformatted(label);
+	if (ImGui::BeginPopup("picker"))
+	{
+		ImGui::ColorPicker4("picker", col,
+		ImGuiColorEditFlags_NoInputs |
+		ImGuiColorEditFlags_NoSidePreview |
+		ImGuiColorEditFlags_NoSmallPreview);
+		ImGui::EndPopup();
+	}
 
-    ImGui::PopID();
+	ImGui::SameLine();
+	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 1);
+	ImGui::TextUnformatted(label);
+
+	ImGui::PopID();
 }
 
 static void Menu::CustomSlider(const char* label, float* v, float minVal, float maxVal)
@@ -85,17 +102,15 @@ static void Menu::CustomSlider(const char* label, float* v, float minVal, float 
 	ImVec2 p = ImGui::GetCursorScreenPos();
 	ImDrawList* dl = ImGui::GetWindowDrawList();
 
-	float slider_width = 150.f;
-	float slider_height = 18.f;
-	float grab_size = 10.f;
+	float slider_width = 200.f;
+	float slider_height = 20.f;
+	float grab_size = 8.f;
 
-	// Create invisible button for interaction
 	ImGui::InvisibleButton("slider", { slider_width, slider_height });
 
 	bool is_active = ImGui::IsItemActive();
 	bool is_hovered = ImGui::IsItemHovered();
 
-	// Handle dragging
 	if (is_active && ImGui::IsMouseDragging(0, 0.f))
 	{
 		float mouse_x = ImGui::GetMousePos().x - p.x;
@@ -103,22 +118,38 @@ static void Menu::CustomSlider(const char* label, float* v, float minVal, float 
 		*v = minVal + percentage * (maxVal - minVal);
 	}
 
-	// Calculate grab position
 	float percentage = (*v - minVal) / (maxVal - minVal);
 	percentage = std::clamp(percentage, 0.0f, 1.0f);
 	float grab_x = p.x + percentage * slider_width;
 
-	ImU32 bg_col = is_hovered ? IM_COL32(55, 55, 55, 255) : IM_COL32(45, 45, 45, 255);
-	dl->AddRectFilled(p, { p.x + slider_width, p.y + slider_height }, bg_col, 4.f);
+	// Shadow
+	dl->AddRectFilled({ p.x + 1, p.y + 1 }, { p.x + slider_width + 1, p.y + slider_height + 1 }, IM_COL32(0, 0, 0, 60), 5.f);
 
-	dl->AddRectFilled(p, { grab_x, p.y + slider_height },
-	IM_COL32(130, 90, 255, 255), 4.f);
+	// Background
+	ImU32 bg_col = is_hovered ? IM_COL32(50, 50, 50, 255) : IM_COL32(35, 35, 35, 255);
+	dl->AddRectFilled(p, { p.x + slider_width, p.y + slider_height }, bg_col, 5.f);
 
-	ImU32 grab_col = is_active ? IM_COL32(150, 110, 255, 255) : IM_COL32(130, 90, 255, 255);
+	// Filled portion with gradient effect
+	dl->AddRectFilledMultiColor(
+	p, { grab_x, p.y + slider_height },
+	IM_COL32(100, 70, 200, 255),
+	IM_COL32(130, 90, 255, 255),
+	IM_COL32(130, 90, 255, 255),
+	IM_COL32(100, 70, 200, 255));
+
+	// Border
+	dl->AddRect(p, { p.x + slider_width, p.y + slider_height }, IM_COL32(0, 0, 0, 150), 5.f, 0, 1.5f);
+
+	// Grab circle shadow
+	dl->AddCircleFilled({ grab_x, p.y + slider_height / 2 }, grab_size + 1, IM_COL32(0, 0, 0, 100));
+
+	// Grab circle
+	ImU32 grab_col = is_active ? IM_COL32(160, 120, 255, 255) : IM_COL32(255, 255, 255, 255);
 	dl->AddCircleFilled({ grab_x, p.y + slider_height / 2 }, grab_size, grab_col);
-	dl->AddCircle({ grab_x, p.y + slider_height / 2 }, grab_size, IM_COL32(0, 0, 0, 255), 12, 1.5f);
+	dl->AddCircle({ grab_x, p.y + slider_height / 2 }, grab_size, IM_COL32(0, 0, 0, 200), 16, 1.5f);
 
 	ImGui::SameLine();
+	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 3);
 	ImGui::Text("%s: %.1f", label, *v);
 
 	ImGui::PopID();
@@ -128,14 +159,28 @@ void Menu::createESP()
 {
 	CustomCheckbox("Enable ESP", &Globals::esp_enabled);
 
-	ImGui::SameLine(ImGui::GetWindowWidth() - 35.f);
-	ImGui::Text("...");
+	ImGui::SameLine(ImGui::GetWindowWidth() - 40.f);
+	ImVec2 bind_p = ImGui::GetCursorScreenPos();
+	ImDrawList* dl = ImGui::GetWindowDrawList();
+
+	ImGui::InvisibleButton("bind_btn", { 25, 20 });
+	bool bind_hovered = ImGui::IsItemHovered();
+
 	if (ImGui::IsItemClicked())
 	{
 		ESP::bind_popup_pos = ImGui::GetMousePos();
 		ESP::wait_for_bind = false;
 		ImGui::OpenPopup("ESP Bind");
 	}
+
+	// Bind button
+	ImU32 bind_col = bind_hovered ? IM_COL32(130, 90, 255, 255) : IM_COL32(60, 60, 60, 255);
+	dl->AddRectFilled(bind_p, { bind_p.x + 25, bind_p.y + 20 }, bind_col, 3.f);
+	dl->AddRect(bind_p, { bind_p.x + 25, bind_p.y + 20 }, IM_COL32(0, 0, 0, 150), 3.f, 0, 1.5f);
+
+	dl->AddCircleFilled({ bind_p.x + 8, bind_p.y + 10 }, 2.f, IM_COL32(255, 255, 255, 255));
+	dl->AddCircleFilled({ bind_p.x + 13, bind_p.y + 10 }, 2.f, IM_COL32(255, 255, 255, 255));
+	dl->AddCircleFilled({ bind_p.x + 18, bind_p.y + 10 }, 2.f, IM_COL32(255, 255, 255, 255));
 
 	ImGui::SetNextWindowPos(ESP::bind_popup_pos, ImGuiCond_Appearing);
 	if (ImGui::BeginPopupModal("ESP Bind", nullptr,
@@ -145,10 +190,10 @@ void Menu::createESP()
 	{
 		ImGui::TextUnformatted("ESP Toggle Bind");
 		ImGui::Separator();
+		ImGui::Spacing();
 
 		if (!ESP::wait_for_bind)
 		{
-
 			if (ImGui::Button("Set bind", { 140, 0 }))
 			{
 				ESP::wait_for_bind = true;
@@ -160,7 +205,6 @@ void Menu::createESP()
 			{
 				ImGui::CloseCurrentPopup();
 			}
-				
 		}
 		else
 		{
@@ -184,68 +228,89 @@ void Menu::createESP()
 
 void Menu::createSubESP()
 {
+	ImGui::Indent(20.f);
+
 	CustomCheckbox("Box", &Globals::esp_box);
+	ImGui::SameLine(ImGui::GetWindowWidth() - 140.f);
 	CustomColor("Box color", Globals::esp_box_color);
 
 	ImGui::Spacing();
 
 	CustomCheckbox("Skeleton", &Globals::esp_skeleton);
+	ImGui::SameLine(ImGui::GetWindowWidth() - 140.f);
 	CustomColor("Skeleton color", Globals::esp_skeleton_color);
 
 	ImGui::Spacing();
 
 	CustomCheckbox("Name", &Globals::esp_name);
 	CustomCheckbox("Health bar", &Globals::esp_health);
+
+	ImGui::Unindent(20.f);
 }
 
 void Menu::createAimbot()
 {
 	CustomCheckbox("Enable Aimbot", &Globals::aimbot_enabled);
+	ImGui::Spacing();
+
 	CustomSlider("FOV", &Globals::aimbot_fov, 0.f, 89.f);
-	
+	ImGui::Spacing();
+
 	CustomCheckbox("Enable Smooth", &Globals::aimbot_smooth);
+	ImGui::Spacing();
+
 	CustomSlider("Smoothness", &Globals::aimbot_smoothness, 0.f, 1.f);
-
-
 }
 
-
-
-
-// will display visuals here
 void Menu::Render()
 {
 	ImGui::SetNextWindowSize({ SIZE_X, SIZE_Y }, ImGuiCond_Once);
 	ImGui::Begin("TRAF CLIENT", &IsOpen,
-		ImGuiWindowFlags_NoResize 
-		| ImGuiWindowFlags_NoCollapse 
-		// | ImGuiWindowFlags_NoScrollbar
-	);
+	ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
 	ImDrawList* dl = ImGui::GetWindowDrawList();
 	ImVec2 wp = ImGui::GetWindowPos();
 
-	dl->AddRectFilled(
-		wp,
-		{ wp.x + ImGui::GetWindowWidth(), wp.y + 3 },
-		IM_COL32(130, 90, 255, 255)
-	);
+	// Top accent bar with gradient
+	dl->AddRectFilledMultiColor(
+	wp,
+	{ wp.x + ImGui::GetWindowWidth(), wp.y + 3 },
+	IM_COL32(100, 70, 200, 255),
+	IM_COL32(130, 90, 255, 255),
+	IM_COL32(130, 90, 255, 255),
+	IM_COL32(100, 70, 200, 255));
 
 	ImGui::Spacing();
+	ImGui::Spacing();
+
+	// ESP Section
+	ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(130, 90, 255, 255));
+	ImGui::Text("ESP");
+	ImGui::PopStyleColor();
 	ImGui::Spacing();
 
 	createESP();
-
 	ImGui::Spacing();
 	createSubESP();
 
-
-
-	ImGui::Separator();
+	ImGui::Spacing();
 	ImGui::Spacing();
 
-	// aimbot stuff
-	ImGui::Separator();
+	// Separator line
+	ImVec2 sep_pos = ImGui::GetCursorScreenPos();
+	dl->AddLine(
+	{ sep_pos.x, sep_pos.y },
+	{ sep_pos.x + ImGui::GetWindowWidth() - 30, sep_pos.y },
+	IM_COL32(80, 80, 80, 255),
+	1.5f);
+
+	ImGui::Spacing();
+	ImGui::Spacing();
+
+	// Aimbot Section
+	ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(130, 90, 255, 255));
+	ImGui::Text("AIMBOT");
+	ImGui::PopStyleColor();
 	ImGui::Spacing();
 
 	createAimbot();

@@ -10,7 +10,7 @@ namespace Menu
 		static bool wait_for_bind = false; // specefically for esp
 		static ImVec2 bind_popup_pos = {}; // esp
 	}
-	static constexpr int SIZE_X = 320, SIZE_Y = 260;
+	static constexpr int SIZE_X = 640, SIZE_Y = 520;
     inline bool IsOpen = false;
 
 
