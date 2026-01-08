@@ -132,12 +132,12 @@ void Menu::createESP()
 	ImGui::Text("...");
 	if (ImGui::IsItemClicked())
 	{
-		bind_popup_pos = ImGui::GetMousePos();
-		wait_for_bind = false;
+		ESP::bind_popup_pos = ImGui::GetMousePos();
+		ESP::wait_for_bind = false;
 		ImGui::OpenPopup("ESP Bind");
 	}
 
-	ImGui::SetNextWindowPos(bind_popup_pos, ImGuiCond_Appearing);
+	ImGui::SetNextWindowPos(ESP::bind_popup_pos, ImGuiCond_Appearing);
 	if (ImGui::BeginPopupModal("ESP Bind", nullptr,
 		ImGuiWindowFlags_NoMove |
 		ImGuiWindowFlags_NoResize |
@@ -146,14 +146,21 @@ void Menu::createESP()
 		ImGui::TextUnformatted("ESP Toggle Bind");
 		ImGui::Separator();
 
-		if (!wait_for_bind)
+		if (!ESP::wait_for_bind)
 		{
+
 			if (ImGui::Button("Set bind", { 140, 0 }))
-				wait_for_bind = true;
+			{
+				ESP::wait_for_bind = true;
+			}
 
 			ImGui::SameLine();
+
 			if (ImGui::Button("Close", { 80, 0 }))
+			{
 				ImGui::CloseCurrentPopup();
+			}
+				
 		}
 		else
 		{
@@ -166,13 +173,12 @@ void Menu::createESP()
 				if (key != VK_ESCAPE)
 					Globals::esp_bind = key;
 
-				wait_for_bind = false;
+				ESP::wait_for_bind = false;
 				ImGui::CloseCurrentPopup();
 			}
 		}
 
 		ImGui::EndPopup();
-		createSubESP();
 	}
 }
 
@@ -196,6 +202,11 @@ void Menu::createAimbot()
 {
 	CustomCheckbox("Enable Aimbot", &Globals::aimbot_enabled);
 	CustomSlider("FOV", &Globals::aimbot_fov, 0.f, 89.f);
+	
+	CustomCheckbox("Enable Smooth", &Globals::aimbot_smooth);
+	CustomSlider("Smoothness", &Globals::aimbot_smoothness, 0.f, 1.f);
+
+
 }
 
 
@@ -205,10 +216,11 @@ void Menu::createAimbot()
 void Menu::Render()
 {
 	ImGui::SetNextWindowSize({ SIZE_X, SIZE_Y }, ImGuiCond_Once);
-	ImGui::Begin("VISUALS", &IsOpen,
-	ImGuiWindowFlags_NoResize |
-	ImGuiWindowFlags_NoCollapse |
-	ImGuiWindowFlags_NoScrollbar);
+	ImGui::Begin("TRAF CLIENT", &IsOpen,
+		ImGuiWindowFlags_NoResize 
+		| ImGuiWindowFlags_NoCollapse 
+		// | ImGuiWindowFlags_NoScrollbar
+	);
 
 	ImDrawList* dl = ImGui::GetWindowDrawList();
 	ImVec2 wp = ImGui::GetWindowPos();
@@ -224,11 +236,12 @@ void Menu::Render()
 
 	createESP();
 
-	ImGui::Separator();
 	ImGui::Spacing();
-
 	createSubESP();
 
+
+
+	ImGui::Separator();
 	ImGui::Spacing();
 
 	// aimbot stuff

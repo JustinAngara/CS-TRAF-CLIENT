@@ -1,11 +1,15 @@
 #pragma once
 #include "../../ext/imgui/imgui.h"
 
-namespace Menu {
+namespace Menu
+{
 
 	// vars
-	static bool wait_for_bind = false;
-	static ImVec2 bind_popup_pos = {};
+	namespace ESP
+	{
+		static bool wait_for_bind = false; // specefically for esp
+		static ImVec2 bind_popup_pos = {}; // esp
+	}
 	static constexpr int SIZE_X = 320, SIZE_Y = 260;
     inline bool IsOpen = false;
 
