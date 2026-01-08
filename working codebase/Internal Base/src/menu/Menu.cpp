@@ -172,9 +172,8 @@ void Menu::createESP()
 		}
 
 		ImGui::EndPopup();
-
+		createSubESP();
 	}
-	createSubESP();
 }
 
 void Menu::createSubESP()
@@ -202,6 +201,7 @@ void Menu::createAimbot()
 
 
 
+// will display visuals here
 void Menu::Render()
 {
 	ImGui::SetNextWindowSize({ SIZE_X, SIZE_Y }, ImGuiCond_Once);
@@ -214,9 +214,10 @@ void Menu::Render()
 	ImVec2 wp = ImGui::GetWindowPos();
 
 	dl->AddRectFilled(
-	wp,
-	{ wp.x + ImGui::GetWindowWidth(), wp.y + 3 },
-	IM_COL32(130, 90, 255, 255));
+		wp,
+		{ wp.x + ImGui::GetWindowWidth(), wp.y + 3 },
+		IM_COL32(130, 90, 255, 255)
+	);
 
 	ImGui::Spacing();
 	ImGui::Spacing();
