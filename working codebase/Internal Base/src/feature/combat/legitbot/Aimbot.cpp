@@ -9,26 +9,26 @@
 
 namespace Aimbot {
 
-	namespace AIM = Globals;
 
     void Run() 
     {
-		if (!AIM::aimbot_enabled)
+		if (!Globals::aimbot_enabled)
 			return;
 
         C_CSPlayerPawn* local = EntityManager::Get().GetLocalPawn();
         if (!local || !local->IsAlive()) return;
 
-        if (!(GetAsyncKeyState(AIM::aimbot_key) & 0x8000))
-			return;
+        if (!(GetAsyncKeyState(Globals::aimbot_key) & 0x8000)) return;
 
-        C_CSPlayerPawn* bestTarget = GetBestTarget(local);
+
+		// select best player via a FoV premise/x,y based
+        C_CSPlayerPawn* bestTarget = getBestTarget(local);
         if (!bestTarget) return;
 
-        AimAtTarget(local, bestTarget);
+        aimAtTarget(local, bestTarget);
     }
 
-    void AimAtTarget(C_CSPlayerPawn* local, C_CSPlayerPawn* target) 
+    void aimAtTarget(C_CSPlayerPawn* local, C_CSPlayerPawn* target) 
     {
         if (!local || !target) return;
 
@@ -42,26 +42,31 @@ namespace Aimbot {
         uintptr_t client = Memory::GetModuleBase("client.dll");
         if (!client) return;
 
+		// from client we want to get the current angle
         Vector* currentAngles = reinterpret_cast<Vector*>(client + Offsets::dwViewAngles);
         if (!currentAngles) return;
 
-        if (AIM::aimbot_smooth)
+        if (Globals::aimbot_smooth)
         {
             Vector delta = aimAngles - *currentAngles;
             Utils::NormalizeAngles(delta);
 
-            *currentAngles += delta * AIM::aimbot_smoothness;
+			// this is going to be how we traverse through certian FOVs
+            *currentAngles += delta * Globals::aimbot_smoothness;
         }
         else 
         {
+			
             *currentAngles = aimAngles;
         }
+
 
         Utils::NormalizeAngles(*currentAngles);
     }
 
-    C_CSPlayerPawn* GetBestTarget(C_CSPlayerPawn* local) 
+    C_CSPlayerPawn* getBestTarget(C_CSPlayerPawn* local) 
     {
+		// grab all the entities
         const auto& entities = EntityManager::Get().GetEntities();
         C_CSPlayerPawn* bestTarget = nullptr;
 		float bestDistance = Globals::aimbot_fov;
@@ -69,18 +74,24 @@ namespace Aimbot {
         uintptr_t client = Memory::GetModuleBase("client.dll");
         if (!client) return nullptr;
 
+		// get current angles
         Vector* currentAngles = reinterpret_cast<Vector*>(client + Offsets::dwViewAngles);
         if (!currentAngles) return nullptr;
 
         for (const auto& ent : entities) 
         {
-            if (!ent.pawn || !ent.pawn->IsAlive()) continue;
+			// base case
+			if (!ent.pawn || !ent.pawn->IsAlive()) continue;
             if (!ent.isEnemy) continue;
 
+
+			// find the pos
             Vector headPos = Utils::GetBonePos(ent.pawn, BoneID::Head);
             if (headPos.IsZero()) continue;
 
+
             Vector localPos = local->m_vOldOrigin() + local->m_vecViewOffset();
+
 
             Vector aimAngles = Utils::CalcAngle(localPos, headPos);
             float fov = Utils::GetFoV(*currentAngles, aimAngles);

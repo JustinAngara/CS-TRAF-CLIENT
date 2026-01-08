@@ -1,6 +1,7 @@
 #pragma once
 #include <cmath>
 
+// this will typically display certain parts of the client/character
 struct Vector {
     float x, y, z;
 

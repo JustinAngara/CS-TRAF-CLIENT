@@ -5,8 +5,7 @@
 namespace Aimbot
 {
 	// settings
-
 	void Run();
-	void AimAtTarget(C_CSPlayerPawn* local, C_CSPlayerPawn* target);
-	C_CSPlayerPawn* GetBestTarget(C_CSPlayerPawn* local);
+	void aimAtTarget(C_CSPlayerPawn* local, C_CSPlayerPawn* target);
+	C_CSPlayerPawn* getBestTarget(C_CSPlayerPawn* local);
 }
