@@ -42,7 +42,7 @@ namespace Offsets
 	constexpr std::ptrdiff_t m_iObserverMode = 0x40;
 
 	// -> Buttons
-	constexpr std::ptrdiff_t jump = 0x1851DF0;
+	constexpr std::ptrdiff_t jump = 0x1BE88B0;
 
 
 }
