@@ -1,5 +1,5 @@
 ﻿# Traf: CS2 Hack
-# CS2 Version: 1.41.2.8
+# CS2 Updated Version: January
 
 ![Alt text](images/1.png)
 ![Alt text](images/2.png)

@@ -6,7 +6,7 @@
 #include "../../../sdk/utils/Globals.h"
 
 #include <Windows.h>
-
+#include <iostream>
 
 void Aimbot::run() 
 {
@@ -30,11 +30,14 @@ void Aimbot::aimAtTarget(C_CSPlayerPawn* local, C_CSPlayerPawn* target)
 {
     if (!local || !target) return;
 
-    Vector targetPos = Utils::GetBonePos(target, BoneID::Head);
+
+	BoneID targetBone = findNearestBoneId(local, target);
+	std::cout << "this is target bone: " << (int)targetBone << '\n';
+	// tchange bone pos
+	Vector targetPos = Utils::GetBonePos(target, targetBone);
     if (targetPos.IsZero()) return;
 
-    Vector localPos = local->m_vOldOrigin() + local->m_vecViewOffset();
-
+	Vector localPos = local->m_vOldOrigin() + local->m_vecViewOffset();
     Vector aimAngles = Utils::CalcAngle(localPos, targetPos);
 
     uintptr_t client = Memory::GetModuleBase("client.dll");
@@ -42,12 +45,15 @@ void Aimbot::aimAtTarget(C_CSPlayerPawn* local, C_CSPlayerPawn* target)
 
 	// from client we want to get the current angle
     Vector* currentAngles = reinterpret_cast<Vector*>(client + Offsets::dwViewAngles);
-    if (!currentAngles) return;
+	
+	if (!currentAngles) return;
 
     if (Globals::aimbot_smooth)
     {
         Vector delta = aimAngles - *currentAngles;
-        Utils::NormalizeAngles(delta);
+		Utils::NormalizeAngles(delta);
+
+		
 
 		// this is going to be how we traverse through certian FOVs
         *currentAngles += delta * (1.f-Globals::aimbot_smoothness);
@@ -58,9 +64,54 @@ void Aimbot::aimAtTarget(C_CSPlayerPawn* local, C_CSPlayerPawn* target)
         *currentAngles = aimAngles;
     }
 
-
-    Utils::NormalizeAngles(*currentAngles);
 }
+
+BoneID Aimbot::findNearestBoneId(C_CSPlayerPawn* local, C_CSPlayerPawn* target)
+{
+	if (!local || !target) return BoneID::Head;
+
+	const BoneID iterateBones[] = {
+		BoneID::Head,
+		BoneID::Neck,
+		BoneID::LeftShoulder,
+		BoneID::RightShoulder,
+		BoneID::Spine
+	};
+
+	uintptr_t client = Memory::GetModuleBase("client.dll");
+	if (!client) return BoneID::Head;
+	Vector* currentAngles = reinterpret_cast<Vector*>(client + Offsets::dwViewAngles);
+
+	if (!currentAngles)	return BoneID::Head;
+
+
+	Vector localPos = local->m_vOldOrigin() + local->m_vecViewOffset();
+	BoneID bestBone = BoneID::Head;
+	float bestFov = FLT_MAX;
+
+
+	for (int i = 0; i < sizeof(iterateBones) / sizeof(BoneID); i++)
+	{
+		Vector bonePos = Utils::GetBonePos(target, iterateBones[i]);
+		if (bonePos.IsZero()) continue;
+
+		Vector aimAngles = Utils::CalcAngle(localPos, bonePos);
+		float fov = Utils::GetFoV(*currentAngles, aimAngles);
+
+		// penalty against other vals
+		float penalty = i * 0.15f;
+		float adjustedFov = fov + penalty;
+
+		if (adjustedFov < bestFov)
+		{
+			bestFov = adjustedFov;
+			bestBone = iterateBones[i];
+		}
+	}
+
+	return bestBone;
+}
+
 
 C_CSPlayerPawn* Aimbot::getBestTarget(C_CSPlayerPawn* local)
 {
