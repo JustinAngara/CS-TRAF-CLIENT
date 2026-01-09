@@ -90,8 +90,8 @@ void ESP::render()
 
         if (Globals::esp_name && ent.controller)
         {
-            char nameBuf[64]{};
-            uintptr_t namePtr = reinterpret_cast<uintptr_t>(ent.controller->m_iszPlayerName());
+            char nameBuf[128]{};
+			uintptr_t namePtr = reinterpret_cast<uintptr_t>(ent.controller->m_szTeamname());
             if (Utils::SafeReadString(namePtr, nameBuf))
             {
                 ImVec2 ts = ImGui::CalcTextSize(nameBuf);

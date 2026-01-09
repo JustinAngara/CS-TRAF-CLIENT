@@ -27,7 +27,7 @@ namespace Offsets
 	
 
 	// -> C_CSPlayerController
-    constexpr uintptr_t m_iszPlayerName = 0x6E8;
+	constexpr uintptr_t m_szTeamname = 0x850; // idk the offset
     constexpr uintptr_t m_hPlayerPawn = 0x8FC;
     constexpr uintptr_t m_bPawnIsAlive = 0x7EC;
 

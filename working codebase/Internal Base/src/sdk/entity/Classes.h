@@ -50,6 +50,6 @@ class C_CSPlayerController : public C_BaseEntity
 {
 public:
     SCHEMA(uint32_t, m_hPlayerPawn, Offsets::m_hPlayerPawn);
-    SCHEMA(const char*, m_iszPlayerName, Offsets::m_iszPlayerName);
+	SCHEMA(const char*, m_szTeamname, Offsets::m_szTeamname);
     SCHEMA(bool, m_bPawnIsAlive, Offsets::m_bPawnIsAlive);
 };

@@ -228,7 +228,7 @@ namespace Utils
 	}
 
 	// safely reads a null-terminated string from a memory address with exception handling to prevent crashes
-	inline bool SafeReadString(uintptr_t addr, char* out, size_t maxLen = 64)
+	inline bool SafeReadString(uintptr_t addr, char* out, size_t maxLen = 128)
 	{
 		if (!addr || !out || maxLen == 0)
 			return false;
