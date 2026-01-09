@@ -17,13 +17,19 @@ void ESP::render()
 
     const auto& entities = EntityManager::Get().GetEntities();
     C_CSPlayerPawn* localPawn = EntityManager::Get().GetLocalPawn();
-    if (!localPawn)
-        return;
+    if (!localPawn) return;
 
-    const ImU32 boxCol = ImGui::ColorConvertFloat4ToU32(ImVec4(
-        Globals::esp_box_color[0], Globals::esp_box_color[1],
-        Globals::esp_box_color[2], Globals::esp_box_color[3]
-    ));
+	const ImU32 boxCol1 = ImGui::ColorConvertFloat4ToU32(ImVec4(
+	Globals::esp_box_color[0], Globals::esp_box_color[1],
+	Globals::esp_box_color[2], Globals::esp_box_color[3]));
+
+
+	const ImU32 boxCol2 = ImGui::ColorConvertFloat4ToU32(ImVec4(
+	Globals::esp_box_color_2[0], Globals::esp_box_color_2[1],
+	Globals::esp_box_color_2[2], Globals::esp_box_color_2[3]));
+
+
+
     const ImU32 skelCol = ImGui::ColorConvertFloat4ToU32(ImVec4(
         Globals::esp_skeleton_color[0], Globals::esp_skeleton_color[1],
         Globals::esp_skeleton_color[2], Globals::esp_skeleton_color[3]
@@ -38,7 +44,14 @@ void ESP::render()
         C_CSPlayerPawn* pawn = ent.pawn;
         if (!pawn || !pawn->IsAlive()) continue;
 
-        if (pawn->m_iTeamNum() == localPawn->m_iTeamNum()) continue;
+		//std::cout << "this is a pawn: " << pawn->m_iTeamNum(); // 3 ct
+		//std::cout << "this is a my pawn: " << localPawn->m_iTeamNum(); // 2 t
+
+		const ImU32 boxCol = pawn->m_iTeamNum() != localPawn->m_iTeamNum() ? boxCol1 : boxCol2;
+
+        // if (pawn->m_iTeamNum() == localPawn->m_iTeamNum()) continue;
+		
+
 
         Vector feet = pawn->m_vOldOrigin();
         Vector head = Utils::GetBonePos(pawn, BoneID::Head);
