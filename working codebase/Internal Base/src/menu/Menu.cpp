@@ -260,6 +260,8 @@ void Menu::createAimbot()
 	ImGui::Spacing();
 
 	CustomSlider("Smoothness", &Globals::aimbot_smoothness, 0.f, 1.f);
+
+	CustomCheckbox("Enable Friendly Fire", &Globals::aimbot_friendly_fire);
 }
 
 void Menu::Render()

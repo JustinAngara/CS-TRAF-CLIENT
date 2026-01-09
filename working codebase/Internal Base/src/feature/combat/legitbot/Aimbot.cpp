@@ -79,8 +79,8 @@ C_CSPlayerPawn* Aimbot::getBestTarget(C_CSPlayerPawn* local)
     for (const auto& ent : entities) 
     {
 		// base case
-		if (!ent.pawn || !ent.pawn->IsAlive()) continue;
-        if (!ent.isEnemy) continue;
+		bool isTeammate = !ent.isEnemy;
+		if (isTeammate && !Globals::aimbot_friendly_fire) continue;
 
 
 		// find the pos
