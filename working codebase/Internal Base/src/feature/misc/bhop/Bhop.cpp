@@ -6,9 +6,9 @@
 
 #include <chrono>
 #include "Bhop.h"
-
 namespace Bhop
 {
+
 	static bool jumpActive = false;
 	static std::chrono::steady_clock::time_point lastActionTime = std::chrono::steady_clock::now();
 	static const int jumpDelayMs = 3;

@@ -37,16 +37,17 @@ void ESP::render()
     const ImU32 nameCol = ImGui::ColorConvertFloat4ToU32(ImVec4(
         Globals::esp_name_color[0], Globals::esp_name_color[1],
         Globals::esp_name_color[2], Globals::esp_name_color[3]
-    ));
+    )); // if is running, make name col red
 
     for (const auto& ent : entities)
     {
+
         C_CSPlayerPawn* pawn = ent.pawn;
         if (!pawn || !pawn->IsAlive()) continue;
 
 		//std::cout << "this is a pawn: " << pawn->m_iTeamNum(); // 3 ct
 		//std::cout << "this is a my pawn: " << localPawn->m_iTeamNum(); // 2 t
-
+	
 		/// blue is the same, green is opposite
 		const ImU32 boxCol = pawn->m_iTeamNum() == localPawn->m_iTeamNum() ? boxCol1 : boxCol2;
 

@@ -70,32 +70,30 @@ BoneID Aimbot::findNearestBoneId(C_CSPlayerPawn* local, C_CSPlayerPawn* target)
 {
 	if (!local || !target) return BoneID::Head;
 
-	int start = 0;
-	const BoneID iterateBones[] = {
+	constexpr BoneID iterateBones[] = {
 		BoneID::Head,
 		BoneID::Neck,
-		BoneID::Spine, // will start here if baim is on
+		BoneID::Spine,
 		BoneID::Stomach,
 		BoneID::LeftShoulder,
 		BoneID::RightShoulder,
 	};
 
-	if (Globals::aimbot_force_baim &&  target->m_iHealth() <= Globals::aimbot_baim_min)
-	{
-		start = 2;
-	}
+	
+	bool validBaim = Globals::aimbot_force_baim && target->m_iHealth() <= Globals::aimbot_baim_min;
+
+	int start = validBaim ? 2 : 0; // 0 is head, 1 is neck, 2 is spine ...
 
 	uintptr_t client = Memory::GetModuleBase("client.dll");
-	if (!client) return BoneID::Head;
+	if (!client) return iterateBones[start];
+
 	Vector* currentAngles = reinterpret_cast<Vector*>(client + Offsets::dwViewAngles);
-
-	if (!currentAngles)	return BoneID::Head;
-
+	if (!currentAngles) return iterateBones[start];
 
 	Vector localPos = local->m_vOldOrigin() + local->m_vecViewOffset();
-	BoneID bestBone = BoneID::Head;
-	float bestFov = FLT_MAX;
 
+	BoneID bestBone = iterateBones[start];
+	float bestFov = FLT_MAX;
 
 	for (int i = start; i < sizeof(iterateBones) / sizeof(BoneID); i++)
 	{
@@ -105,7 +103,7 @@ BoneID Aimbot::findNearestBoneId(C_CSPlayerPawn* local, C_CSPlayerPawn* target)
 		Vector aimAngles = Utils::CalcAngle(localPos, bonePos);
 		float fov = Utils::GetFoV(*currentAngles, aimAngles);
 
-		// penalty against other vals
+		// penalize lower bone structs
 		float penalty = i * 0.15f;
 		float adjustedFov = fov + penalty;
 
@@ -118,7 +116,6 @@ BoneID Aimbot::findNearestBoneId(C_CSPlayerPawn* local, C_CSPlayerPawn* target)
 
 	return bestBone;
 }
-
 
 C_CSPlayerPawn* Aimbot::getBestTarget(C_CSPlayerPawn* local)
 {
