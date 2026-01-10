@@ -1,100 +1,157 @@
 #include "Aimbot.h"
-#include "../../../../sdk/entity/EntityManager.h"
-#include "../../../../sdk/utils/Utils.h"
-#include "../../../../sdk/utils/Globals.h"
-#include "../../../../sdk/memory/Offsets.h"
+#include "../../../sdk/entity/EntityManager.h"
+#include "../../../sdk/utils/Utils.h"
+#include "../../../sdk/memory/PatternScan.h"
+#include "../../../sdk/memory/Offsets.h"
+#include "../../../sdk/utils/Globals.h"
+
 #include <Windows.h>
 
-namespace Aimbot {
-    
-    void Run() {
-        if (!aimbot_enabled) return;
+void Aimbot::run()
+{
 
-        C_CSPlayerPawn* local = EntityManager::Get().GetLocalPawn();
-        if (!local || !local->IsAlive()) return;
+	if (!Globals::aimbot_enabled) return;
 
-        // Check if aimbot key is pressed
-        if (!(GetAsyncKeyState(aimbot_key) & 0x8000)) return;
+    C_CSPlayerPawn* local = EntityManager::Get().GetLocalPawn();
+    if (!local || !local->IsAlive()) return;
 
-        // Find best target
-        C_CSPlayerPawn* bestTarget = GetBestTarget(local);
-        if (!bestTarget) return;
+    if (!(GetAsyncKeyState(Globals::aimbot_key) & 0x8000)) return;
 
-        // Aim at target
-        AimAtTarget(local, bestTarget);
+
+	// select best player via a FoV premise/x,y based
+    C_CSPlayerPawn* bestTarget = getBestTarget(local);
+    if (!bestTarget) return;
+
+    aimAtTarget(local, bestTarget);
+}
+
+void Aimbot::aimAtTarget(C_CSPlayerPawn* local, C_CSPlayerPawn* target)
+{
+    if (!local || !target) return;
+
+
+	BoneID targetBone = findNearestBoneId(local, target);
+	// tchange bone pos
+	Vector targetPos = Utils::GetBonePos(target, targetBone);
+    if (targetPos.IsZero()) return;
+
+	Vector localPos = local->m_vOldOrigin() + local->m_vecViewOffset();
+    Vector aimAngles = Utils::CalcAngle(localPos, targetPos);
+
+    uintptr_t client = Memory::GetModuleBase("client.dll");
+    if (!client) return;
+
+	// from client we want to get the current angle
+    Vector* currentAngles = reinterpret_cast<Vector*>(client + Offsets::dwViewAngles);
+
+	if (!currentAngles) return;
+
+    if (Globals::aimbot_smooth)
+    {
+        Vector delta = aimAngles - *currentAngles;
+		Utils::NormalizeAngles(delta);
+
+		// this is going to be how we traverse through certian FOVs
+        *currentAngles += delta * (1.f-Globals::aimbot_smoothness);
+    }
+    else
+    {
+
+        *currentAngles = aimAngles;
     }
 
-    void AimAtTarget(C_CSPlayerPawn* local, C_CSPlayerPawn* target) {
-        if (!local || !target) return;
+}
 
-        // Get target head position
-        Vector targetPos = Utils::GetBonePos(target, BoneID::Head);
-        if (targetPos.IsZero()) return;
+BoneID Aimbot::findNearestBoneId(C_CSPlayerPawn* local, C_CSPlayerPawn* target)
+{
+	if (!local || !target) return BoneID::Head;
 
-        // Get local player eye position
+	constexpr BoneID iterateBones[] = {
+		BoneID::Head,
+		BoneID::Neck,
+		BoneID::Spine,
+		BoneID::Stomach,
+		BoneID::LeftShoulder,
+		BoneID::RightShoulder,
+	};
+
+
+	bool validBaim = Globals::aimbot_force_baim && target->m_iHealth() <= Globals::aimbot_baim_min;
+
+	int start = validBaim ? 2 : 0; // 0 is head, 1 is neck, 2 is spine ...
+
+	uintptr_t client = Memory::GetModuleBase("client.dll");
+	if (!client) return iterateBones[start];
+
+	Vector* currentAngles = reinterpret_cast<Vector*>(client + Offsets::dwViewAngles);
+	if (!currentAngles) return iterateBones[start];
+
+	Vector localPos = local->m_vOldOrigin() + local->m_vecViewOffset();
+
+	BoneID bestBone = iterateBones[start];
+	float bestFov = FLT_MAX;
+
+	for (int i = start; i < sizeof(iterateBones) / sizeof(BoneID); i++)
+	{
+		Vector bonePos = Utils::GetBonePos(target, iterateBones[i]);
+		if (bonePos.IsZero()) continue;
+
+		Vector aimAngles = Utils::CalcAngle(localPos, bonePos);
+		float fov = Utils::GetFoV(*currentAngles, aimAngles);
+
+		// penalize lower bone structs
+		float penalty = i * 0.15f;
+		float adjustedFov = fov + penalty;
+
+		if (adjustedFov < bestFov)
+		{
+			bestFov = adjustedFov;
+			bestBone = iterateBones[i];
+		}
+	}
+
+	return bestBone;
+}
+
+C_CSPlayerPawn* Aimbot::getBestTarget(C_CSPlayerPawn* local)
+{
+	// grab all the entities
+    const auto& entities = EntityManager::Get().GetEntities();
+    C_CSPlayerPawn* bestTarget = nullptr;
+	float bestDistance = Globals::aimbot_fov;
+
+    uintptr_t client = Memory::GetModuleBase("client.dll");
+    if (!client) return nullptr;
+
+	// get current angles
+    Vector* currentAngles = reinterpret_cast<Vector*>(client + Offsets::dwViewAngles);
+    if (!currentAngles) return nullptr;
+
+    for (const auto& ent : entities)
+    {
+		// base case
+		bool isTeammate = !ent.isEnemy;
+		if (isTeammate && !Globals::aimbot_friendly_fire) continue;
+
+
+		// find the pos
+        Vector headPos = Utils::GetBonePos(ent.pawn, BoneID::Head);
+        if (headPos.IsZero()) continue;
+
+
         Vector localPos = local->m_vOldOrigin() + local->m_vecViewOffset();
 
-        // Calculate aim angles
-        Vector aimAngles = Utils::CalcAngle(localPos, targetPos);
-        
-        // Get current view angles (you need to find this offset)
-        uintptr_t client = Memory::GetModuleBase("client.dll");
-        if (!client) return;
 
-        // This offset needs to be found - it's typically in client.dll
-        constexpr uintptr_t dwViewAngles = 0xXXXXXXXX; // Replace with actual offset
-        Vector* currentAngles = reinterpret_cast<Vector*>(client + dwViewAngles);
-        if (!currentAngles) return;
+        Vector aimAngles = Utils::CalcAngle(localPos, headPos);
+        float fov = Utils::GetFoV(*currentAngles, aimAngles);
 
-        // Smooth aiming
-        if (aimbot_smooth) {
-            Vector delta = aimAngles - *currentAngles;
-            Utils::NormalizeAngles(delta);
-            
-            // Apply smoothing
-            *currentAngles += delta * aimbot_smoothness;
-        } else {
-            *currentAngles = aimAngles;
+        if (fov < bestDistance)
+        {
+            bestDistance = fov;
+            bestTarget = ent.pawn;
         }
-
-        // Clamp angles to prevent untrusted
-        Utils::NormalizeAngles(*currentAngles);
     }
 
-    C_CSPlayerPawn* GetBestTarget(C_CSPlayerPawn* local) {
-        const auto& entities = EntityManager::Get().GetEntities();
-        C_CSPlayerPawn* bestTarget = nullptr;
-        float bestDistance = aimbot_fov;
-
-        // Get current view angles for FOV calculation
-        uintptr_t client = Memory::GetModuleBase("client.dll");
-        if (!client) return nullptr;
-        
-        constexpr uintptr_t dwViewAngles = 0xXXXXXXXX; // Replace with actual offset
-        Vector* currentAngles = reinterpret_cast<Vector*>(client + dwViewAngles);
-        if (!currentAngles) return nullptr;
-
-        for (const auto& ent : entities) {
-            if (!ent.pawn || !ent.pawn->IsAlive()) continue;
-            if (!ent.isEnemy) continue;
-
-            // Get head position
-            Vector headPos = Utils::GetBonePos(ent.pawn, BoneID::Head);
-            if (headPos.IsZero()) continue;
-
-            // Get local eye position
-            Vector localPos = local->m_vOldOrigin() + local->m_vecViewOffset();
-
-            // Calculate FOV
-            Vector aimAngles = Utils::CalcAngle(localPos, headPos);
-            float fov = Utils::GetFoV(*currentAngles, aimAngles);
-
-            if (fov < bestDistance) {
-                bestDistance = fov;
-                bestTarget = ent.pawn;
-            }
-        }
-
-        return bestTarget;
-    }
+    return bestTarget;
 }
+
