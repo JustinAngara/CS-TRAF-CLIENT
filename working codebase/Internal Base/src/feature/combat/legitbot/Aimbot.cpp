@@ -6,7 +6,6 @@
 #include "../../../sdk/utils/Globals.h"
 
 #include <Windows.h>
-#include <iostream>
 
 void Aimbot::run() 
 {
@@ -52,8 +51,6 @@ void Aimbot::aimAtTarget(C_CSPlayerPawn* local, C_CSPlayerPawn* target)
     {
         Vector delta = aimAngles - *currentAngles;
 		Utils::NormalizeAngles(delta);
-
-		
 
 		// this is going to be how we traverse through certian FOVs
         *currentAngles += delta * (1.f-Globals::aimbot_smoothness);
