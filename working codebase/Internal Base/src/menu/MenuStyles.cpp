@@ -1,11 +1,9 @@
 #include "MenuStyles.h"
+#include "../sdk/utils/MenuColors.h"
 
-#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <vector>
-#include <type_traits>
-
 
 struct Particle
 {
@@ -133,52 +131,52 @@ namespace MenuStyles
 		dl->AddRectFilled(
 		wp,
 		{ wp.x + win_width, wp.y + win_height },
-		IM_COL32(8, 8, 12, 160),
+		MenuColors::dark_bg,
 		12.0f);
 
 		dl->AddRectFilled(
 		{ wp.x + 1, wp.y + 1 },
 		{ wp.x + win_width - 1, wp.y + win_height - 1 },
-		IM_COL32(12, 12, 18, 120),
+		MenuColors::darker_bg,
 		12.0f);
 
 		dl->AddRectFilled(
 		{ wp.x + 2, wp.y + 2 },
 		{ wp.x + win_width - 2, wp.y + win_height - 2 },
-		IM_COL32(18, 18, 25, 90),
+		MenuColors::darkest_bg,
 		12.0f);
 
 		dl->AddRectFilledMultiColor(
 		wp,
 		{ wp.x + win_width, wp.y + 80 },
-		IM_COL32(0, 0, 0, 100),
-		IM_COL32(0, 0, 0, 100),
-		IM_COL32(0, 0, 0, 0),
-		IM_COL32(0, 0, 0, 0));
+		MenuColors::black,
+		MenuColors::black,
+		MenuColors::transparent,
+		MenuColors::transparent);
 
 		dl->AddRectFilledMultiColor(
 		{ wp.x, wp.y + win_height - 80 },
 		{ wp.x + win_width, wp.y + win_height },
-		IM_COL32(0, 0, 0, 0),
-		IM_COL32(0, 0, 0, 0),
-		IM_COL32(0, 0, 0, 100),
-		IM_COL32(0, 0, 0, 100));
+		MenuColors::transparent,
+		MenuColors::transparent,
+		MenuColors::black,
+		MenuColors::black);
 
 		dl->AddRectFilledMultiColor(
 		wp,
 		{ wp.x + 60, wp.y + win_height },
-		IM_COL32(0, 0, 0, 80),
-		IM_COL32(0, 0, 0, 0),
-		IM_COL32(0, 0, 0, 0),
-		IM_COL32(0, 0, 0, 80));
+		MenuColors::black_80,
+		MenuColors::transparent,
+		MenuColors::transparent,
+		MenuColors::black_80);
 
 		dl->AddRectFilledMultiColor(
 		{ wp.x + win_width - 60, wp.y },
 		{ wp.x + win_width, wp.y + win_height },
-		IM_COL32(0, 0, 0, 0),
-		IM_COL32(0, 0, 0, 80),
-		IM_COL32(0, 0, 0, 80),
-		IM_COL32(0, 0, 0, 0));
+		MenuColors::transparent,
+		MenuColors::black_80,
+		MenuColors::black_80,
+		MenuColors::transparent);
 	}
 
 	void RenderTopAccent(ImDrawList* dl, ImVec2 wp, float win_width)
@@ -202,8 +200,8 @@ namespace MenuStyles
 		{ wp.x + win_width, wp.y + 12 },
 		IM_COL32(130, 90, 255, a),
 		IM_COL32(130, 90, 255, a),
-		IM_COL32(130, 90, 255, 0),
-		IM_COL32(130, 90, 255, 0));
+		MenuColors::transparent,
+		MenuColors::transparent);
 	}
 
 	void RenderSeparator(ImDrawList* dl, ImVec2 sep_pos, float width)
@@ -214,10 +212,10 @@ namespace MenuStyles
 		dl->AddRectFilledMultiColor(
 		{ sep_pos.x - 10, sep_pos.y },
 		{ sep_pos.x + width, sep_pos.y + 2 },
-		IM_COL32(130, 90, 255, 0),
+		MenuColors::transparent,
 		IM_COL32(130, 90, 255, a),
 		IM_COL32(130, 90, 255, a),
-		IM_COL32(130, 90, 255, 0));
+		MenuColors::transparent);
 	}
 
 	void SectionHeader(const char* title, float glow_width)
@@ -234,7 +232,7 @@ namespace MenuStyles
 		IM_COL32(130, 90, 255, a),
 		5.f);
 
-		ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(150, 110, 255, 255));
+		ImGui::PushStyleColor(ImGuiCol_Text, MenuColors::light_purple);
 		ImGui::TextUnformatted(title);
 		ImGui::PopStyleColor();
 		ImGui::Spacing();
@@ -253,7 +251,7 @@ namespace MenuStyles
 		if (ImGui::IsItemClicked())
 			*v = !*v;
 
-		ImU32 glow_col = hovered ? IM_COL32(130, 90, 255, 60) : IM_COL32(0, 0, 0, 0);
+		ImU32 glow_col = hovered ? MenuColors::purple_glow : MenuColors::transparent;
 		if (hovered || *v)
 			dl->AddRectFilled({ p.x - 2, p.y - 2 }, { p.x + sz + 2, p.y + sz + 2 }, glow_col, 6.f);
 
@@ -261,18 +259,18 @@ namespace MenuStyles
 		{
 			dl->AddRectFilledMultiColor(
 			p, { p.x + sz, p.y + sz },
-			IM_COL32(120, 80, 230, 255),
-			IM_COL32(150, 100, 255, 255),
-			IM_COL32(150, 100, 255, 255),
-			IM_COL32(120, 80, 230, 255));
+			MenuColors::checkbox_purple,
+			MenuColors::checkbox_bright_purple,
+			MenuColors::checkbox_bright_purple,
+			MenuColors::checkbox_purple);
 		}
 		else
 		{
-			ImU32 bg_col = hovered ? IM_COL32(65, 65, 75, 255) : IM_COL32(45, 45, 55, 255);
+			ImU32 bg_col = hovered ? MenuColors::hover_gray : MenuColors::dark_gray;
 			dl->AddRectFilled(p, { p.x + sz, p.y + sz }, bg_col, 5.f);
 		}
 
-		ImU32 border_col = *v ? IM_COL32(160, 120, 255, 255) : IM_COL32(80, 80, 90, 255);
+		ImU32 border_col = *v ? MenuColors::vibrant_purple : MenuColors::gray;
 		dl->AddRect(p, { p.x + sz, p.y + sz }, border_col, 5.f, 0, 2.f);
 
 		if (*v)
@@ -281,8 +279,8 @@ namespace MenuStyles
 			ImVec2 check_mid = { p.x + sz / 2 - 1, p.y + sz - 6 };
 			ImVec2 check_end = { p.x + sz - 4, p.y + 4 };
 
-			dl->AddLine(check_start, check_mid, IM_COL32(255, 255, 255, 255), 2.5f);
-			dl->AddLine(check_mid, check_end, IM_COL32(255, 255, 255, 255), 2.5f);
+			dl->AddLine(check_start, check_mid, MenuColors::white, 2.5f);
+			dl->AddLine(check_mid, check_end, MenuColors::white, 2.5f);
 		}
 
 		ImGui::SameLine();
@@ -308,18 +306,18 @@ namespace MenuStyles
 			ImGui::OpenPopup("picker");
 
 		if (hovered)
-			dl->AddRectFilled({ p.x - 2, p.y - 2 }, { p.x + 30, p.y + 22 }, IM_COL32(130, 90, 255, 40), 5.f);
+			dl->AddRectFilled({ p.x - 2, p.y - 2 }, { p.x + 30, p.y + 22 }, MenuColors::purple_hover, 5.f);
 
 		dl->AddRectFilled(p, { p.x + 28, p.y + 20 }, c, 4.f);
 
 		dl->AddRectFilledMultiColor(
 		{ p.x + 2, p.y + 2 }, { p.x + 26, p.y + 8 },
-		IM_COL32(255, 255, 255, 30),
-		IM_COL32(255, 255, 255, 30),
-		IM_COL32(255, 255, 255, 0),
-		IM_COL32(255, 255, 255, 0));
+		MenuColors::white_highlight,
+		MenuColors::white_highlight,
+		MenuColors::transparent,
+		MenuColors::transparent);
 
-		ImU32 border_col = hovered ? IM_COL32(150, 110, 255, 255) : IM_COL32(90, 90, 100, 255);
+		ImU32 border_col = hovered ? MenuColors::light_purple : MenuColors::light_gray;
 		dl->AddRect(p, { p.x + 28, p.y + 20 }, border_col, 4.f, 0, 2.f);
 
 		if (ImGui::BeginPopup("picker"))
@@ -338,6 +336,5 @@ namespace MenuStyles
 
 		ImGui::PopID();
 	}
-
 
 }

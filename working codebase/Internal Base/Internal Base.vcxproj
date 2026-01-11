@@ -80,6 +80,7 @@
     <ClInclude Include="src\sdk\memory\Patterns.h" />
     <ClInclude Include="src\sdk\memory\PatternScan.h" />
     <ClInclude Include="src\sdk\utils\Globals.h" />
+    <ClInclude Include="src\sdk\utils\MenuColors.h" />
     <ClInclude Include="src\sdk\utils\Utils.h" />
     <ClInclude Include="src\sdk\utils\Vector.h" />
   </ItemGroup>
